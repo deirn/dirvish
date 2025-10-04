@@ -343,6 +343,17 @@ opening and customized handling of specific file types."
 
 ;;;; Helpers
 
+(defmacro dirvish--ht (&rest kvs)
+  "Return a new hash-table with `equal' as its test function.
+KVS is list of key value pair that will be inserted to the hash table.
+
+\(fn [KEY VAL]...)"
+  (declare (indent defun))
+  `(let ((h (make-hash-table :test 'equal)))
+     ,@(cl-loop for (k v) on kvs by #'cddr
+                collect `(puthash ,k ,v h))
+     h))
+
 (defmacro dirvish-prop (prop &rest body)
   "Retrieve PROP from `dirvish--props'.
 Set the PROP with BODY if given."
@@ -389,17 +400,6 @@ RECORD defaults to `:default' record in `dirvish--timers'."
 (defsubst dirvish-curr ()
   "Return Dirvish session attached to current buffer, if there is any."
   (gethash (dirvish-prop :dv) dirvish--sessions))
-
-(defmacro dirvish--ht (&rest kvs)
-  "Return a new hash-table with `equal' as its test function.
-KVS is list of key value pair that will be inserted to the hash table.
-
-\(fn [KEY VAL]...)"
-  (declare (indent defun))
-  `(let ((h (make-hash-table :test 'equal)))
-     ,@(cl-loop for (k v) on kvs by #'cddr
-                collect `(puthash ,k ,v h))
-     h))
 
 (defun dirvish--timestamp ()
   "Return current timestamp string with \"%D|%T\" format."
